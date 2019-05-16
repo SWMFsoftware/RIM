@@ -1,0 +1,73 @@
+<!-- The syntax is described by share/Scripts/CheckParam.pl and the manual -->
+
+<commandList name="Ridley Ionosphere Model: IE Component">
+
+List of IE/RIM commands used in the PARAM.in file.
+
+
+<set name="NameComp"          type="string" value="$_NameComp"/>
+<set name="NameRestartOutDir" type="string" value="$NameComp/restartOUT"/>
+<set name="NamePlotDir"       type="string" value="$NameComp/ionosphere"/>
+
+<commandgroup name="IONOSPHERIC PARAMETERS">
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!!!!!!!!!!!!!!!!!!!!!! PHYSICAL PARAMETERS !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+Options to configure how the ionosphere is handled/solved.  Includes options
+for conductance, auroral oval options, etc.
+
+<command name="IONOSPHERE">
+	<parameter name="iConductanceModel" type="integer"
+							input="select">
+		<option name="(0) constant Pedersen and 0 Hall"
+							value="0" />
+		<option name="(1) constant Pedersen and Hall"
+							value="1" />
+		<option name="(2) F107 flux and and constant Hall"
+							value="2" />
+		<option name="(3) Simple oval"		value="3" />
+		<option name="(4) Restricted oval"	value="4" />
+		<option name="(5) Realistic oval" 	value="5" 
+							default="T"/>
+	</parameter>
+	<parameter name="F107Flux" type="real" min="0" default="150"/>
+	<parameter name="StarLightPedConductance" type="real" min="0.001" 
+						default="0.25"/>
+	<parameter name="PolarCapPedConductance" type="real" min="0" 
+						default="0.25"/>
+
+	<rule expr="not ($iConductanceModel=~/3|4|5/ and $F107Flux==0)">
+		F107Flux must be positive for ConductanceModel = 3, 4 or 5
+	</rule>
+#IONOSPHERE
+5			iConductanceModel
+150.0			F107Flux
+0.25			StarLightPedConductance
+0.25			PolarCapPedConductance
+
+The iConductanceModel variable determines which ionosphere model is used:\\
+  0 - uses a constant Pedersen conductance which is set by 
+      StarLightPedConductance\\
+  1 - uses a constant Pedersen conductance which is set by 
+      StarLightPedConductance, and a constant Hall conductance
+      which is set by PolarCapPedConductance\\
+  2 - uses a solar EUV combined with a nightside conductance, so
+      it uses F107Flux and StarLightPedConductance\\
+  3 - uses solar EUV, nightside, and crude oval, so uses
+      F107Flux, StarLightPedConductance, and PolarCapPedConductance,
+      since a polar cap is defined with the oval.\\
+  4 - restricted oval, uses same variables as 3.\\
+  5 - more realistic oval, uses same variables as 3.\\
+
+Model 4 and 5 differ in the way the conductances are limited to the
+fitted oval. Model 4 is more restrictive, while model 5 is somewhat
+more relaxed.
+
+
+</command>
+
+
+</commandgroup>
+
+
+</commandList>
