@@ -7,7 +7,7 @@ List of IE/RIM commands used in the PARAM.in file.
 
 <set name="NameComp"          type="string" value="$_NameComp"/>
 <set name="NameRestartOutDir" type="string" value="$NameComp/restartOUT"/>
-<set name="NamePlotDir"       type="string" value="$NameComp/ionosphere"/>
+<set name="NamePlotDir"       type="string" value="$NameComp/Output"/>
 
 <commandgroup name="IONOSPHERIC PARAMETERS">
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -66,6 +66,24 @@ more relaxed.
 
 </command>
 
+<command name="HPI">
+  <parameter name="HemisphericPower" type="real" min="0" default="20.0"/>
+  #HPI
+  20.0          HemisphericPower
+
+  Set the hemispheric power to a constant in gigawatts. Time dynamic simulations with
+  variable HPI can use the #NOAAHPI_INDICES command to set time varying HPI values.
+</command>
+  
+<command name="SOLARWINDFILE">
+  <parameter NAME="NameUpstreamFile" type="string"/>
+  #SOLARWINDFILE
+  IMF_NSturning_1nT.dat   NameUpstreamFile
+
+  Use a time varying set of solar wind conditions as contained within NameUpstreamFile.
+  Format of this file can be found in the documentation for the command of the same
+  name within the BATS-R-US MHD model.
+</command>
 
 </commandgroup>
 

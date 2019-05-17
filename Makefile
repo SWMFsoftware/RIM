@@ -6,11 +6,12 @@ install:
 LIB:
 	cd src; make LIB
 
+# WARNING: Some functions dependent on existence of UA.
 rundir:
+	cd ${IEDIR}/src; make POST # Make postprocessing tool.
 	mkdir -p ${RUNDIR}/IE/Output
 	cd ${RUNDIR}/IE; ln -s ${DIR}/UA/GITM2/srcData Input; cd ${DIR}
-	cd ${RUNDIR}; ln -s ${DIR}/UA/GITM2/src/PostProcess.exe PostGITM.exe; cd ${DIR}
-	cd ${DIR}/UA/GITM2 ; make POST ; cd ${DIR}
+	cd ${RUNDIR}; ln -s ${IEDIR}/src/PostRIM.exe PostRIM.exe; cd ${DIR}
 	cd ${RUNDIR}/IE; ln -s ${IEDIR}/src/pIE .; cd ${DIR}
 	cd ${RUNDIR};    ln -s ${EMPIRICALIEDIR}/data EIE
 

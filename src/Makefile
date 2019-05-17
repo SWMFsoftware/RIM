@@ -69,12 +69,15 @@ LIB:	DEPEND
 	@echo ${MY_LIB} has been brought up to date.
 	@echo
 
-${MY_LIB}:	${MF} ${MODULES} ${OBJECTS}
+${MY_LIB}:${MF} ${MODULES} ${OBJECTS}
 	rm -f ${MY_LIB}
 	${AR} ${MY_LIB} ${MODULES} ${OBJECTS}
 
-#       Cleaning
+# PostProcessing tools:
+POST:	PostProcess.o
+	${LINK.f90} ${Lflag2} -o PostRIM.exe PostProcess.o
 
+#       Cleaning
 clean: cleanfiles
 
 distclean: clean
