@@ -207,15 +207,15 @@ contains
                UseStaticIMF = .false.
             endif
 
-         case ("#MHD_INDICES")
-            cTempLines(1) = NameCommand
+         case ("#SOLARWINDFILE")
+            cTempLines(1) = "#MHD_INDICES"
             call read_var('imffilename', imffilename)
             cTempLines(2) = imffilename
             cTempLines(3) = " "
             cTempLines(4) = "#END"
             call IO_set_inputs(cTempLines)
             call read_MHDIMF_Indices(iError)
-
+            
             if (iError /= 0) then 
                write(*,*) "read indices was NOT successful"
                EXIT
