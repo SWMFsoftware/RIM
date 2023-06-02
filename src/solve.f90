@@ -2,6 +2,7 @@
 !  For more information, see http://csem.engin.umich.edu/tools/swmf
 subroutine solve_RIM
 
+  use ModUtilities, ONLY: CON_stop
   use ModRIM
   use ModParamRIM
   use ModNumConst,     only: cPi

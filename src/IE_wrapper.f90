@@ -32,13 +32,14 @@ module IE_wrapper
   public:: IE_get_for_rb
 
   ! Coupling with UA
+  public:: IE_get_info_for_ua
   public:: IE_get_for_ua
   public:: IE_put_from_ua
 
 contains
 
   subroutine IE_set_param(CompInfo, TypeAction)
-
+  
     use ModProcIE
     use ModRIM
     use ModIoRIM
@@ -46,7 +47,8 @@ contains
 
     use ModIoUnit
     use CON_comp_info
-
+    use ModUtilities, ONLY: CON_set_do_test, CON_stop
+    
     character (len=*), parameter :: NameSub='IE_set_param'
 
     ! Arguments
@@ -91,7 +93,7 @@ contains
 
       use ModReadParam
       use ModFilesRIM
-      use ModUtilities, ONLY: fix_dir_name, check_dir, lower_case
+      use ModUtilities, ONLY: fix_dir_name, check_dir, lower_case, CON_stop
 
       ! The name of the command
       character (len=100) :: NameCommand
@@ -368,6 +370,7 @@ contains
     ! Since IE has a static grid the descriptor has to be set once.
     ! There can be many couplers that attempt to set the descriptor,
     ! so we must check IsInitialized.
+    use ModUtilities, ONLY: CON_set_do_test
     use ModProcIE
     use ModRIM
     use CON_coupler
@@ -411,9 +414,9 @@ contains
          nDim=2,                            &! dimensionality
          nRootBlock_D=(/1,1/),              &! north+south hemispheres
          nCell_D =(/nLats+2,nLonsAll+1/),   &! size of node based grid
-         XyzMin_D=(/cOne, cOne/),           &! min colat and longitude indexes
-         XyzMax_D=(/real(nLats+2),          &! max colat and longitude indexes
-         real(nLonsAll+1)/),                &
+         XyzMin_D=(/1.0, 1.0/),             &! min colat and longitude indexes
+         XyzMax_D=(/real(nLats+2.0),        &! max colat and longitude indexes
+         real(nLonsAll+1.0)/),              &
          TypeCoord='SMG',                   &! solar magnetic coord.
          Coord1_I=LatitudeAll(:,1),         &! colatitudes
          Coord2_I=LongitudeAll(1,:),        &! longitudes
@@ -428,8 +431,8 @@ contains
   subroutine IE_get_for_gm(Buffer_IIV,iSize,jSize,nVar,NameVar_I,tSimulation)
 
     ! Put variables listed in NameVar_I into the buffer
-
-    use ModProcIE, ONLY: nProc
+    use ModUtilities, ONLY: CON_stop
+    use ModProcIE,    ONLY: nProc
     use ModSizeRIM
     use ModRIM
 
@@ -474,6 +477,7 @@ contains
 
   subroutine IE_put_from_gm(Buffer_IIV,iSize,jSize,nVar)
 
+    use ModUtilities, ONLY: CON_set_do_test
     use ModRIM
     use ModProcIE
     use ModMpi
@@ -590,6 +594,7 @@ contains
   subroutine IE_get_for_pw(Buffer_IIV, iSize, jSize, nVar, Name_V, NameHem,&
        tSimulation)
 
+    use ModUtilities, ONLY: CON_stop
     use ModRIM
     use ModProcIE
 
@@ -651,6 +656,7 @@ contains
     ! indexes stored in Index and weights stored in Weight
     ! The variables should be put into Buff_V
 
+    use ModUtilities, ONLY: CON_stop
     use CON_router,   ONLY: IndexPtrType, WeightPtrType
     use ModRIM, ONLY: nLats, nLonsAll, &
          PotentialAll, OuterMagJrAll, SigmaHAll, SigmaPAll, &
@@ -743,6 +749,7 @@ contains
 
   subroutine IE_put_from_im(nPoint,iPointStart,Index,Weight,DoAdd,Buff_V,nVar)
 
+    use ModUtilities, ONLY: CON_stop
     use CON_router,   ONLY: IndexPtrType, WeightPtrType
     use ModRIM
 
@@ -816,10 +823,11 @@ contains
 
   subroutine IE_get_for_ps(Buffer_II, iSize, jSize, tSimulation)
 
-    use ModNumConst, ONLY: cRadToDeg
-    use ModIoUnit,   ONLY: UnitTmp_
-    use ModRIM,      ONLY: PotentialAll, LatitudeAll, LongitudeAll
-    use ModSizeRim,  ONLY: nLats, nLonsall
+    use ModUtilities, ONLY: CON_set_do_test
+    use ModNumConst,  ONLY: cRadToDeg
+    use ModIoUnit,    ONLY: UnitTmp_
+    use ModRIM,       ONLY: PotentialAll, LatitudeAll, LongitudeAll
+    use ModSizeRim,   ONLY: nLats, nLonsall
 
     integer, intent(out)          :: iSize, jSize
     real, intent(out)             :: Buffer_II(nLats+2,nLonsAll+1)
@@ -871,6 +879,7 @@ contains
 
   subroutine IE_put_from_PS(nPoint,iPointStart,Index,Weight,DoAdd,Buff_V,nVar)
 
+    use ModUtilities, ONLY: CON_stop
     use CON_router,   ONLY: IndexPtrType, WeightPtrType
     use ModRIM
 
@@ -942,60 +951,55 @@ contains
 
   !============================================================================
 
-  subroutine IE_put_from_UA(Buffer_III, iBlock, nMLTs, nLats, nVarsToPass)
+  subroutine IE_put_from_UA(Buffer_IIBV, nMLTs, nLats, nVarIn, NameVarUaIn_V)
 
-
-    integer, intent(in) :: nMlts, nLats, iBlock, nVarsToPass
-    real, dimension(nMlts, nLats, nVarsToPass), intent(in) :: Buffer_III
-
+    use ModUtilities, ONLY: CON_stop
+    
+    ! Arguments: returning IE variables on a MLT-Lat grid, one
+    ! per hemisphere, for nVarIn variables.
+    integer,          intent(in) :: nMlts, nLats, nVarIn
+    character(len=3), intent(in) :: NameVarUaIn_V(nVarIn)
+    real,             intent(in) :: Buffer_IIBV(nMlts, nLats, 2, nVarIn)
+    
     character (len=*),parameter :: NameSub='IE_put_from_UA'
 
-    call CON_stop(NameSub//': IE_ERROR: empty version cannot be used!')
+    call CON_stop(NameSub//': Coupling with UA and IE/RIM is not implemented.')
 
   end subroutine IE_put_from_UA
 
+ !============================================================================
+
+  subroutine IE_get_info_for_ua(nVar, NameVar_V)
+
+    use ModUtilities, ONLY: CON_stop
+    
+    integer, intent(out) :: nVar
+    character(len=*), intent(out), optional :: NameVar_V(:)
+
+    character(len=*), parameter:: NameSub = 'IE_get_info_for_ua'
+    !--------------------------------------------------------------------------
+
+    ! UA-IE coupling using RIM is not currently implemented.
+    call CON_stop(NameSub//': Coupling with UA and IE/RIM is not implemented.')
+
+  end subroutine IE_get_info_for_ua
   !============================================================================
 
-  subroutine IE_get_for_ua(Buffer_II,iSize,jSize,NameVar,NameHem,tSimulation)
+  subroutine IE_get_for_ua(Buffer_IIV, iSize, jSize, nVarIn, NameVar_V, &
+       iBlock,tSimulation)
 
-    use ModProcIE
-    use ModSizeRIM
-    use ModRIM
-
-    integer,          intent(in)  :: iSize,jSize
-    real,             intent(out) :: Buffer_II(iSize,jSize)
-    character (len=*),intent(in)  :: NameVar
-    character (len=*),intent(in)  :: NameHem
+    use ModUtilities, ONLY: CON_stop
+    
+    integer,          intent(in)  :: iSize, jSize, nVarIn, iBlock
+    real,             intent(out) :: Buffer_IIV(iSize,jSize,nVarIn)
+    character (len=*),intent(in)  :: NameVar_V(nVarIn)
     real,             intent(in)  :: tSimulation
 
-
-    real                          :: tSimulationTmp
-
-    character (len=*),parameter :: NameSub='IE_get_for_ua'
-
+    character(len=*), parameter:: NameSub = 'IE_get_for_ua'
     !--------------------------------------------------------------------------
-    if(iSize /= nLats+2 .or. jSize /= nLons*nProc+1)then
-       write(*,*)NameSub//' incorrect buffer size=',iSize,jSize,&
-            ' nLats+2,nLons*nProc+1=',nLats+2,nLons*nProc+1
-       call CON_stop(NameSub//' SWMF_ERROR')
-    end if
 
-    select case(NameVar)
-
-    case('Pot')
-       ! Make sure that the most recent result is provided
-       ! Since Pot is always the first, we just run this the first time.
-       tSimulationTmp = tSimulation
-       call IE_run(tSimulationTmp,tSimulation)
-       Buffer_II = PotentialAll
-    case('Ave')
-       Buffer_II = AveEAll
-    case('Tot')
-       Buffer_II = EFluxAll
-    case default
-       call CON_stop(NameSub//' invalid NameVar='//NameVar)
-
-    end select
+    ! UA-IE coupling using RIM is not currently implemented.
+    call CON_stop(NameSub//': Coupling with UA and IE/RIM is not implemented.')
 
   end subroutine IE_get_for_ua
 
@@ -1004,7 +1008,8 @@ contains
   subroutine IE_init_session(iSession, tSimulation)
 
     ! Initialize the Ionosphere Electrostatic (IE) module for session iSession
-
+    use ModUtilities, ONLY: CON_set_do_test
+    
     use CON_physics, ONLY: get_time, get_planet, get_axes
     use ModRIM,      ONLY: IsTimeAccurate, ThetaTilt, DipoleStrength, StartTime
     use ModIoRIM,    ONLY: dt_output, t_output_last
@@ -1098,6 +1103,7 @@ contains
 
   subroutine IE_run(tSimulation,tSimulationLimit)
 
+    use ModUtilities, ONLY: CON_set_do_test
     use ModProcIE
     use ModRIM
     use ModParamRIM, only: iDebugLevel, DoSolve, UseTests
@@ -1176,6 +1182,7 @@ end module IE_wrapper
 
 subroutine SPS_put_into_ie(Buffer_II, iSize, jSize, NameVar)
 
+  use ModUtilities, ONLY: CON_stop
   use ModEIE_Interface
 
   implicit none

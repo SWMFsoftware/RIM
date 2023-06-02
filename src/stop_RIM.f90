@@ -3,6 +3,8 @@
 
 subroutine stop_RIM(str)
 
+  use ModUtilities, ONLY: CON_stop
+  
   implicit none
 
   character (len=*), intent(in) :: str
